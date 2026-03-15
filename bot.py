@@ -5,7 +5,6 @@ import json
 import os
 
 # --- DATABASE LOGIC ---
-# This part makes sure the bot remembers your channels after a restart
 def load_settings():
     if os.path.exists("settings.json"):
         with open("settings.json", "r") as f:
@@ -20,7 +19,8 @@ class GlitchBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True 
-        super().__init__(command_prefix=None, intents=intents) 
+        intents.message_content = True # Added this to be safe
+        super().__init__(command_prefix="!", intents=intents) 
         self.server_settings = load_settings()
 
     async def setup_hook(self):
@@ -30,21 +30,19 @@ class GlitchBot(commands.Bot):
 bot = GlitchBot()
 
 # --- SLASH COMMANDS ---
-
 @bot.tree.command(name="welcomer", description="Set the channel for welcome messages")
 async def welcomer(interaction: discord.Interaction, channel: discord.TextChannel):
     bot.server_settings["welcome"] = channel.id
-    save_settings(bot.server_settings) # Save to file
+    save_settings(bot.server_settings)
     await interaction.response.send_message(f"✅ Welcome channel set to {channel.mention}", ephemeral=True)
 
 @bot.tree.command(name="leaver", description="Set the channel for leave messages")
 async def leaver(interaction: discord.Interaction, channel: discord.TextChannel):
     bot.server_settings["leave"] = channel.id
-    save_settings(bot.server_settings) # Save to file
+    save_settings(bot.server_settings)
     await interaction.response.send_message(f"✅ Leave channel set to {channel.mention}", ephemeral=True)
 
 # --- TEST COMMANDS ---
-
 @bot.tree.command(name="welcomertest", description="Test the welcome message")
 async def welcomertest(interaction: discord.Interaction):
     if not bot.server_settings["welcome"]:
@@ -59,34 +57,33 @@ async def leavertest(interaction: discord.Interaction):
     await on_member_remove(interaction.user)
     await interaction.response.send_message("Leave test sent!", ephemeral=True)
 
-# --- AUTO EVENTS (Avatar Based) ---
-
+# --- AUTO EVENTS ---
 @bot.event
 async def on_member_join(member):
     channel_id = bot.server_settings.get("welcome")
     if channel_id:
         channel = bot.get_channel(channel_id)
-        count = len(member.guild.members)
-        embed = discord.Embed(
-            title="Welcome to GLITCH",
-            description=f"Welcome {member.mention}!\nYou are member **#{count}**",
-            color=0x00FF00 # Neon Green
-        )
-        embed.set_image(url=member.display_avatar.url)
-        await channel.send(embed=embed)
+        if channel:
+            count = len(member.guild.members)
+            embed = discord.Embed(title="Welcome to GLITCH", description=f"Welcome {member.mention}!\nYou are member **#{count}**", color=0x00FF00)
+            embed.set_image(url=member.display_avatar.url)
+            await channel.send(embed=embed)
 
 @bot.event
 async def on_member_remove(member):
     channel_id = bot.server_settings.get("leave")
     if channel_id:
         channel = bot.get_channel(channel_id)
-        embed = discord.Embed(
-            title="A Glitch Has Been Fixed",
-            description=f"**{member.name}** has left the server.",
-            color=0xFF0000 # Neon Red
-        )
-        embed.set_image(url=member.display_avatar.url)
-        await channel.send(embed=embed)
+        if channel:
+            embed = discord.Embed(title="A Glitch Has Been Fixed", description=f"**{member.name}** has left the server.", color=0xFF0000)
+            embed.set_image(url=member.display_avatar.url)
+            await channel.send(embed=embed)
 
-bot.run("MTQ4MjU1NzM0OTY1MzkwOTYyNQ.GbFvzf.1TJ-bF73qYoesXO2eM3YYI2xSYGBpiioWYBHSY")
+# --- THE FIX ---
+# This grabs the token from the "Environment" tab you set up in Render
+token = os.environ.get('DISCORD_TOKEN')
 
+if token:
+    bot.run(token)
+else:
+    print("Error: No DISCORD_TOKEN found in Render Environment Variables!")
