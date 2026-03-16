@@ -6,7 +6,7 @@ import json
 from flask import Flask
 from threading import Thread
 
-# Web server for Render
+# --- WEB SERVER ---
 app = Flask('')
 @app.route('/')
 def home(): return "Online"
@@ -17,7 +17,7 @@ def keep_alive():
     t.start()
 keep_alive()
 
-# Database
+# --- DATA ---
 S_FILE = "settings.json"
 def save(d):
     with open(S_FILE, "w") as f: json.dump(d, f)
@@ -28,7 +28,7 @@ def load():
         except: pass
     return {"welcome": {}, "leave": {}}
 
-# Bot Setup
+# --- BOT ---
 class MyBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -39,8 +39,11 @@ class MyBot(commands.Bot):
     async def setup_hook(self): await self.tree.sync()
 bot = MyBot()
 
-# Embed and Message Creators
+# --- MESSAGE BUILDERS ---
 def w_emb(m):
     e = discord.Embed(title="✨ Welcome!", description=f"Welcome {m.mention} to {m.guild.name}!\nMember #{m.guild.member_count}", color=0x00ff00)
     e.set_thumbnail(url=m.display_avatar.url)
     return e
+
+def l_box(m): 
+    return f"
