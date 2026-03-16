@@ -64,13 +64,13 @@ async def on_member_remove(m):
 async def welcomer(i, channel: discord.TextChannel):
     bot.data["welcome"][str(i.guild.id)] = channel.id
     save(bot.data)
-    await i.response.send_message(f"Welcome set to {channel.mention}", ephemeral=True)
+    await i.response.send_message(f"The welcomer channel has been set to {channel.mention}", ephemeral=True)
 
 @bot.tree.command(name="leaver")
 async def leaver(i, channel: discord.TextChannel):
     bot.data["leave"][str(i.guild.id)] = channel.id
     save(bot.data)
-    await i.response.send_message(f"Leave set to {channel.mention}", ephemeral=True)
+    await i.response.send_message(f"The leaver channel has been set to {channel.mention}", ephemeral=True)
 
 @bot.tree.command(name="say")
 async def say(i, text: str):
@@ -82,5 +82,11 @@ async def wtest(i):
     await i.channel.send(embed=w_emb(i.user))
     await i.response.send_message("Test sent", ephemeral=True)
 
+@bot.tree.command(name="leavertest")
+async def ltest(i):
+    await i.channel.send(l_box(i.user))
+    await i.response.send_message("Test sent", ephemeral=True)
+
 # THE SCRIPT ENDS EXACTLY ON THE LINE BELOW
 bot.run(os.environ.get('DISCORD_TOKEN'))
+
