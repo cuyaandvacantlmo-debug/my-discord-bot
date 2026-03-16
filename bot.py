@@ -6,65 +6,37 @@ import json
 from flask import Flask
 from threading import Thread
 
-# --- RENDER STABILITY SYSTEM ---
 app = Flask('')
 @app.route('/')
-def home(): return "Bot is online!"
-
-def run():
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
-
+def home(): return "Online"
+def run(): app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
 def keep_alive():
     t = Thread(target=run)
     t.daemon = True
     t.start()
-
 keep_alive()
 
-# --- DATABASE SETTINGS ---
-SETTINGS_FILE = "settings.json"
-def save_settings(data):
-    with open(SETTINGS_FILE, "w") as f: json.dump(data, f)
-
-def load_settings():
-    if os.path.exists(SETTINGS_FILE):
+S_FILE = "settings.json"
+def save(d):
+    with open(S_FILE, "w") as f: json.dump(d, f)
+def load():
+    if os.path.exists(S_FILE):
         try:
-            with open(SETTINGS_FILE, "r") as f: return json.load(f)
-        except: return {"welcome": {}, "leave": {}}
+            with open(S_FILE, "r") as f: return json.load(f)
+        except: pass
     return {"welcome": {}, "leave": {}}
 
-# --- BOT CONFIGURATION ---
 class MyBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.members = True          
-        intents.message_content = True  
+        intents.members = True
+        intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
-        self.data = load_settings()
-
-    async def setup_hook(self):
-        await self.tree.sync()
-        print(f"✅ Commands Synced")
-
+        self.data = load()
+    async def setup_hook(self): await self.tree.sync()
 bot = MyBot()
 
-@bot.event
-async def on_ready():
-    print(f"🚀 {bot.user} is connected.")
-
-def get_welcome_embed(member):
-    embed = discord.Embed(title="✨ Welcome!", description=f"Hey {member.mention}, welcome to **{member.guild.name}**!\nMember #**{member.guild.member_count}**.", color=discord.Color.blue())
-    embed.set_thumbnail(url=member.display_avatar.url)
-    return embed
-
-def get_leave_box(member):
-    return f"
-http://googleusercontent.com/immersive_entry_chip/0
-
-### Next Steps:
-1.  **GitHub:** Paste this new code into `bot.py` and commit the changes.
-2.  **Requirements:** Make sure `requirements.txt` has `flask` and `discord.py` written inside it.
-3.  **Wait:** Give Render a minute to redeploy. 
-
-Once it says "Live," try the `/say` command in your server to confirm it's working! Would you like me to check anything else?
+def w_emb(m):
+    e = discord.Embed(title="✨ Welcome!", description=f"Welcome {m.mention} to {m.guild.name}!\nMember #{m.guild.member_count}", color=0x00ff00)
+    e.set_thumbnail(url=m.display_avatar.url)
+    return e
