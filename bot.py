@@ -61,3 +61,6 @@ def get_welcome_embed(member):
 def get_leave_box(member):
     return f"
 http://googleusercontent.com/immersive_entry_chip/0
+
+**Once you save these changes, Render will automatically rebuild. Does it show "Live" in green now?**
+http://googleusercontent.com/immersive_entry_chip/0
