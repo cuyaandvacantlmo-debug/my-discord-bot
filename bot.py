@@ -62,5 +62,9 @@ def get_leave_box(member):
     return f"
 http://googleusercontent.com/immersive_entry_chip/0
 
-**Once you save these changes, Render will automatically rebuild. Does it show "Live" in green now?**
-http://googleusercontent.com/immersive_entry_chip/0
+### Next Steps:
+1.  **GitHub:** Paste this new code into `bot.py` and commit the changes.
+2.  **Requirements:** Make sure `requirements.txt` has `flask` and `discord.py` written inside it.
+3.  **Wait:** Give Render a minute to redeploy. 
+
+Once it says "Live," try the `/say` command in your server to confirm it's working! Would you like me to check anything else?
